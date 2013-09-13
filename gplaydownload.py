@@ -2,6 +2,7 @@ import sys
 import getopt
 import os
 import os.path
+import time
 
 from gmusicapi import Musicmanager
 
@@ -25,8 +26,11 @@ def parse_args():
         download_dir += '/'
     return download_dir
 
+def log(msg): 
+    print time.asctime(time.localtime(time.time())) + ": " + msg
+
 def get_songs():
-    print "Checking for updates"
+    log("Checking for updates")
     songs = mm.get_all_songs()
     for song in songs:
         path = download_dir + song['artist'][0] + '/' + song['artist'] + '/' + song['album']
@@ -39,9 +43,9 @@ def get_songs():
         full_path = path + '/' + filename
         if not os.path.isfile(full_path): 
             if not os.path.isdir(path):
-                print "Creating directory " + path
+                log("Creating directory " + path)
                 os.makedirs(path)
-            print "Downloading " + full_path
+            log("Downloading " + full_path)
             suggested_filename, audio = mm.download_song(song['id'])
             with open(full_path, 'wb') as f:
                 f.write(audio)
@@ -49,9 +53,9 @@ def get_songs():
 def run():
     global download_dir, mm
     download_dir = parse_args()
-    print "Creating music manager"
+    log("Creating music manager")
     mm = Musicmanager()
-    print "Attempting login"
+    log("Attempting login")
     if not mm.login():
         print "OAuth required:"
         mm.perform_oauth()
